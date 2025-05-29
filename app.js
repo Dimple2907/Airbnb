@@ -17,6 +17,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user.js');
+const { generalLimiter } = require('./middleware/rateLimiter.js');
 
 const listingsRouter = require('./routes/listing.js');
 const reviewsRouter = require("./routes/review.js");
@@ -25,6 +26,10 @@ const userRouter = require('./routes/user.js');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// Apply general rate limiting to all routes
+app.use(generalLimiter);
+
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use('/public', express.static(path.join(__dirname, 'public')));

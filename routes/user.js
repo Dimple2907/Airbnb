@@ -4,26 +4,28 @@ const User = require('../models/user.js');
 const wrapAsync = require('../utils/wrapAsync.js');
 const passport = require('passport');
 const { saveRedirectUrl } = require('../middleware.js');
+const { authLimiter, signupLimiter, usernameCheckLimiter } = require('../middleware/rateLimiter.js');
 
 const userController = require('../controllers/user.js');
 
 router
     .route("/signup")
-    .get(userController.renderSignUpFrom)
-    .post(wrapAsync(userController.signup));
+    .get(userController.renderSignUpForm)
+    .post(signupLimiter, wrapAsync(userController.signup));
 
 router
     .route("/login")
     .get(userController.renderLoginForm)
     .post(
-    saveRedirectUrl
-    ,passport.authenticate("local", { 
+    authLimiter,
+    saveRedirectUrl,
+    passport.authenticate("local", { 
         failureFlash: true,
         failureRedirect: "/login" 
     }),userController.login);
 
-
-
+// API endpoint for username availability check
+router.get("/check-username/:username", usernameCheckLimiter, wrapAsync(userController.checkUsername));
 
 //logout router
 router.get("/logout",userController.logout);
