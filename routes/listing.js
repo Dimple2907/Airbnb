@@ -15,13 +15,20 @@ const upload = multer({storage});
 
 router
     .route("/")
-    .get(wrapAsync(listingController.index))  //index route
+    .get(wrapAsync(listingController.index))  //index route with search
     .post(
         isLoggedIn,
         upload.single('listing[image]'),
         validateListing,
         wrapAsync(listingController.createListing)
     );
+
+// Search route
+router.get("/search", wrapAsync(listingController.index));
+
+// Search suggestions API
+router.get("/api/suggestions", wrapAsync(listingController.searchSuggestions));
+
 //New route
 router.get("/new",isLoggedIn,listingController.renderNewForm);
 
