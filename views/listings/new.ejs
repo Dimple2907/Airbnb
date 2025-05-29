@@ -1,42 +1,371 @@
 <% layout("/layouts/boilerplate") %>
-<div class="row mt-3">
-    <div class="col-8 offset-2">
-        <br><br>
-    <h3>Create a new listings</h3>
-    <form action="/listings" method="post" class="needs-validation"  novalidate   enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="listing[title]"  class="form-control" placeholder="Add a catchy title" required>
-            <div class="valid-feedback">Title looks good</div>
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea  name="listing[description]"  class="form-control" required></textarea>
-            <div class="invalid-feedback">Please enter a short Description</div>
-        </div> 
-        <div class="mb-3">
-            <label for="image" class="form-label">Upload Image</label>
-            <input type="file" name="listing[image]"  class="form-control"  required>
-        </div>
-        <div class="row">
-            <div class="mb-3 col-md-4">
-                <label for="price" class="form-label">Price</label>
-                <input  name="listing[price]"  class="form-control" placeholder="1200" required>
-                <div class="invalid-feedback">Price should be valid</div>
-            </div>
-            <div class="mb-3 col-md-8">
-                <label for="country" class="form-label">Country</label>
-                <input type="text" name="listing[country]"  class="form-control" placeholder="Indiad" required>
-                <div class="invalid-feedback">Country name should be valid</div>
+
+<!-- New Listing Hero Section -->
+<div class="new-listing-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title gradient-text">Create Your Perfect Listing</h1>
+                <p class="hero-subtitle">Share your space with travelers from around the world</p>
             </div>
         </div>
-        <div class="mb-3">
-            <label for="location" class="form-label">Location</label>
-            <input type="text" name="listing[location]" class="form-control" placeholder="Jaypur,Rajasthan" required>
-            <div class="invalid-feedback">Location name should be valid</div>
+    </div>
+</div>
+
+<!-- Main Form Section -->
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2 class="form-title">Listing Details</h2>
+                    <p class="form-subtitle">Tell us about your amazing space</p>
+                </div>
+
+                <form action="/listings" method="post" class="needs-validation modern-form" novalidate enctype="multipart/form-data" id="newListingForm">
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator mb-4">
+                        <div class="progress-bar" id="formProgress"></div>
+                    </div>
+
+                    <!-- Title Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-edit"></i>
+                            Basic Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="title" class="form-label">
+                                Title
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="listing[title]" 
+                                id="title"
+                                class="form-control modern-input" 
+                                placeholder="Add a catchy title that describes your space"
+                                maxlength="100"
+                                required
+                            >
+                            <div class="character-count">
+                                <span id="titleCount">0</span>/100 characters
+                            </div>
+                            <div class="valid-feedback">
+                                <i class="fas fa-check-circle"></i>
+                                Perfect! Your title looks great
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please enter a descriptive title for your listing
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="form-label">
+                                Description
+                                <span class="required">*</span>
+                            </label>
+                            <textarea 
+                                name="listing[description]" 
+                                id="description"
+                                class="form-control modern-textarea" 
+                                rows="5"
+                                placeholder="Describe your space, amenities, and what makes it special..."
+                                maxlength="1000"
+                                required
+                            ></textarea>
+                            <div class="character-count">
+                                <span id="descriptionCount">0</span>/1000 characters
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please provide a detailed description of your listing
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-camera"></i>
+                            Photos
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="image" class="form-label">
+                                Upload Image
+                                <span class="required">*</span>
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input 
+                                    type="file" 
+                                    name="listing[image]" 
+                                    id="image"
+                                    class="form-control file-input" 
+                                    accept="image/*"
+                                    required
+                                >
+                                <div class="file-upload-area" id="fileUploadArea">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="upload-primary">Click to upload or drag and drop</p>
+                                        <p class="upload-secondary">PNG, JPG or JPEG (Max 5MB)</p>
+                                    </div>
+                                </div>
+                                <div class="image-preview" id="imagePreview" style="display: none;">
+                                    <img id="previewImg" src="" alt="Preview">
+                                    <button type="button" class="remove-image" id="removeImage">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please upload an image of your listing
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Location Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Pricing & Location
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="price" class="form-label">
+                                        Price per night
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="price-input-wrapper">
+                                        <span class="currency-symbol">₹</span>
+                                        <input 
+                                            type="number" 
+                                            name="listing[price]" 
+                                            id="price"
+                                            class="form-control modern-input price-input" 
+                                            placeholder="1200"
+                                            min="1"
+                                            required
+                                        >
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Please enter a valid price
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="country" class="form-label">
+                                        Country
+                                        <span class="required">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        name="listing[country]" 
+                                        id="country"
+                                        class="form-control modern-input" 
+                                        placeholder="e.g., India"
+                                        required
+                                    >
+                                    <div class="invalid-feedback">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Please enter a valid country name
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location" class="form-label">
+                                Location
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="listing[location]" 
+                                id="location"
+                                class="form-control modern-input" 
+                                placeholder="e.g., Jaipur, Rajasthan"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please enter a specific location
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Section -->
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline-secondary btn-lg me-3" onclick="history.back()">
+                            <i class="fas fa-arrow-left"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <span class="btn-text">
+                                <i class="fas fa-plus-circle"></i>
+                                Create Listing
+                            </span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Creating...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <br><br>
-        <button class="btn btn-dark add-btn mt-3">Add</button>
-    </form>
+    </div>
 </div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="success-icon mb-3">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Listing Created Successfully!</h3>
+                <p>Your listing is now live and ready for bookings.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('newListingForm');
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const imageInput = document.getElementById('image');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const removeImageBtn = document.getElementById('removeImage');
+    const submitBtn = document.getElementById('submitBtn');
+    const progressBar = document.getElementById('formProgress');
+
+    // Character counting
+    function updateCharacterCount(input, countElement, maxLength) {
+        const count = input.value.length;
+        countElement.textContent = count;
+        
+        if (count > maxLength * 0.9) {
+            countElement.parentElement.style.color = '#ff6b6b';
+        } else {
+            countElement.parentElement.style.color = '#6c757d';
+        }
+    }
+
+    titleInput.addEventListener('input', function() {
+        updateCharacterCount(this, document.getElementById('titleCount'), 100);
+        updateProgress();
+    });
+
+    descriptionInput.addEventListener('input', function() {
+        updateCharacterCount(this, document.getElementById('descriptionCount'), 1000);
+        updateProgress();
+    });
+
+    // Image upload handling
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                this.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                fileUploadArea.style.display = 'none';
+                imagePreview.style.display = 'block';
+                updateProgress();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('click', () => imageInput.click());
+    
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            imageInput.files = files;
+            imageInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Remove image
+    removeImageBtn.addEventListener('click', function() {
+        imageInput.value = '';
+        fileUploadArea.style.display = 'block';
+        imagePreview.style.display = 'none';
+        updateProgress();
+    });
+
+    // Progress tracking
+    function updateProgress() {
+        const fields = [titleInput, descriptionInput, document.getElementById('price'), 
+                       document.getElementById('country'), document.getElementById('location')];
+        const imageUploaded = imageInput.files.length > 0;
+        
+        let filledFields = fields.filter(field => field.value.trim() !== '').length;
+        if (imageUploaded) filledFields++;
+        
+        const progress = (filledFields / 6) * 100;
+        progressBar.style.width = progress + '%';
+    }
+
+    // Add input listeners for progress tracking
+    ['price', 'country', 'location'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateProgress);
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
+            submitBtn.disabled = true;
+        }
+        
+        form.classList.add('was-validated');
+    });
+
+    // Auto-resize textarea
+    descriptionInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+});
+</script>

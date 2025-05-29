@@ -1,44 +1,362 @@
 <% layout("/layouts/boilerplate") %>
-<div class="row mt-3">
-    <div class="col-8 offset-2">
-    <h1>Edit your Listing</h1>
-    <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="listing[title]" value="<%= listing.title %>" class="form-control" required>
-            <div class="valid-feedback">Title looks good</div>
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea name="listing[description]"   class="form-control" required><%= listing.description %></textarea>
-            <div class="invalid-feedback">Please enter a short Description</div>
-        </div>        <div class="mb-3">
-            <label class="form-label">Current Image</label>
-            <img src="<%= listing.image.url %>" alt="Current listing image" class="img-thumbnail" style="max-width: 250px;">
-        </div>
-        <div class="mb-3">
-            <label for="image" class="form-label">Upload New Image</label>
-            <input type="file" name="listing[image]" class="form-control">
-            <div class="invalid-feedback">Please select a valid image file</div>
-        </div>
-        <div class="row">
-            <div class="mb-3">
-                <label for="price" class="form-label">Price</label>
-                <input type="number" name="listing[price]"  class="form-control" value="<%= listing.price %>" required>
-                <div class="invalid-feedback">Price should be valid</div>
-            </div>
-            <div class="mb-3">
-                <label for="country" class="form-label">Country</label>
-                <input type="text" name="listing[location]"  class="form-control" value="<%= listing.location %>" required>
-                <div class="invalid-feedback">Country name should be valid</div>
+
+<!-- Edit Listing Hero Section -->
+<div class="edit-listing-hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="hero-title gradient-text">Edit Your Listing</h1>
+                <p class="hero-subtitle">Update your listing details to keep it fresh and appealing</p>
             </div>
         </div>
-        <div>
-            <label for="location" class="form-label">Location</label>
-            <input type="text" name="listing[country]"  class="form-control" value="<%= listing.country %>" required>
-            <div class="invalid-feedback">Location name should be valid</div>
+    </div>
+</div>
+
+<!-- Main Form Section -->
+<div class="container form-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-7">
+            <div class="form-card">
+                <div class="form-header">
+                    <h2 class="form-title">Update Listing Details</h2>
+                    <p class="form-subtitle">Make changes to keep your listing competitive</p>
+                </div>
+
+                <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation modern-form" enctype="multipart/form-data" id="editListingForm">
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator mb-4">
+                        <div class="progress-bar" id="formProgress" style="width: 100%;"></div>
+                    </div>
+
+                    <!-- Title Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-edit"></i>
+                            Basic Information
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="title" class="form-label">
+                                Title
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="listing[title]" 
+                                id="title"
+                                class="form-control modern-input" 
+                                value="<%= listing.title %>"
+                                maxlength="100"
+                                required
+                            >
+                            <div class="character-count">
+                                <span id="titleCount"><%= listing.title.length %></span>/100 characters
+                            </div>
+                            <div class="valid-feedback">
+                                <i class="fas fa-check-circle"></i>
+                                Perfect! Your title looks great
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please enter a descriptive title for your listing
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="form-label">
+                                Description
+                                <span class="required">*</span>
+                            </label>
+                            <textarea 
+                                name="listing[description]" 
+                                id="description"
+                                class="form-control modern-textarea" 
+                                rows="5"
+                                maxlength="1000"
+                                required
+                            ><%= listing.description %></textarea>
+                            <div class="character-count">
+                                <span id="descriptionCount"><%= listing.description.length %></span>/1000 characters
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please provide a detailed description of your listing
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-camera"></i>
+                            Photos
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Current Image</label>
+                            <div class="current-image-container">
+                                <img src="<%= listing.image.url %>" alt="Current listing image" class="current-image">
+                                <div class="image-overlay">
+                                    <p class="image-status">
+                                        <i class="fas fa-check-circle"></i>
+                                        Current Image
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="image" class="form-label">
+                                Upload New Image
+                                <span class="optional">(Optional)</span>
+                            </label>
+                            <div class="file-upload-wrapper">
+                                <input 
+                                    type="file" 
+                                    name="listing[image]" 
+                                    id="image"
+                                    class="form-control file-input" 
+                                    accept="image/*"
+                                >
+                                <div class="file-upload-area" id="fileUploadArea">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <div class="upload-text">
+                                        <p class="upload-primary">Click to upload a new image</p>
+                                        <p class="upload-secondary">PNG, JPG or JPEG (Max 5MB)</p>
+                                    </div>
+                                </div>
+                                <div class="image-preview" id="imagePreview" style="display: none;">
+                                    <img id="previewImg" src="" alt="Preview">
+                                    <button type="button" class="remove-image" id="removeImage">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please select a valid image file
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pricing & Location Section -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Pricing & Location
+                        </h3>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <div class="form-group">
+                                    <label for="price" class="form-label">
+                                        Price per night
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="price-input-wrapper">
+                                        <span class="currency-symbol">₹</span>
+                                        <input 
+                                            type="number" 
+                                            name="listing[price]" 
+                                            id="price"
+                                            class="form-control modern-input price-input" 
+                                            value="<%= listing.price %>"
+                                            min="1"
+                                            required
+                                        >
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Please enter a valid price
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location" class="form-label">
+                                Location
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="listing[location]" 
+                                id="location"
+                                class="form-control modern-input" 
+                                value="<%= listing.location %>"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please enter a specific location
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="country" class="form-label">
+                                Country
+                                <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="listing[country]" 
+                                id="country"
+                                class="form-control modern-input" 
+                                value="<%= listing.country %>"
+                                required
+                            >
+                            <div class="invalid-feedback">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Please enter a valid country name
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Section -->
+                    <div class="form-actions">
+                        <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary btn-lg me-3">
+                            <i class="fas fa-arrow-left"></i>
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <span class="btn-text">
+                                <i class="fas fa-save"></i>
+                                Update Listing
+                            </span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Updating...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <button class="btn btn-dark edit-btn mt-3">Edit</button>
-    </form>
+    </div>
 </div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="success-icon mb-3">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Listing Updated Successfully!</h3>
+                <p>Your changes have been saved and are now live.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editListingForm');
+    const titleInput = document.getElementById('title');
+    const descriptionInput = document.getElementById('description');
+    const imageInput = document.getElementById('image');
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const removeImageBtn = document.getElementById('removeImage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Character counting
+    function updateCharacterCount(input, countElement, maxLength) {
+        const count = input.value.length;
+        countElement.textContent = count;
+        
+        if (count > maxLength * 0.9) {
+            countElement.parentElement.style.color = '#ff6b6b';
+        } else {
+            countElement.parentElement.style.color = '#6c757d';
+        }
+    }
+
+    titleInput.addEventListener('input', function() {
+        updateCharacterCount(this, document.getElementById('titleCount'), 100);
+    });
+
+    descriptionInput.addEventListener('input', function() {
+        updateCharacterCount(this, document.getElementById('descriptionCount'), 1000);
+    });
+
+    // Image upload handling
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                this.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                fileUploadArea.style.display = 'none';
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('click', () => imageInput.click());
+    
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('drag-over');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            imageInput.files = files;
+            imageInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Remove image
+    removeImageBtn.addEventListener('click', function() {
+        imageInput.value = '';
+        fileUploadArea.style.display = 'block';
+        imagePreview.style.display = 'none';
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        } else {
+            submitBtn.querySelector('.btn-text').style.display = 'none';
+            submitBtn.querySelector('.btn-loading').style.display = 'inline-block';
+            submitBtn.disabled = true;
+        }
+        
+        form.classList.add('was-validated');
+    });
+
+    // Auto-resize textarea
+    descriptionInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+
+    // Initialize character counts
+    updateCharacterCount(titleInput, document.getElementById('titleCount'), 100);
+    updateCharacterCount(descriptionInput, document.getElementById('descriptionCount'), 1000);
+});
+</script>

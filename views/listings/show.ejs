@@ -1,77 +1,564 @@
-<% layout("/layouts/boilerplate") %>
+<%- layout("/layouts/boilerplate") %>
 
-<div class="row mt-3">
-    <div class="col-6 offset-2">
-        <h1><%= listing.title %></h1>
-</div>
-<div class="card col-6 offset-2 show-card listing-card">
-    <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing image">
-    <div class="card-body">
-    <p class="card-text"><b>Owned by</b>  <i><%= listing.owner.username %></i> </p>
-    <p class="card-text"><%= listing.description %></p>
-    <p class="card-text"> &#8377; <%= listing.price.toLocaleString("en-IN") %></p>  
-    <p class="card-text"><%= listing.location %> </p>
-    <p class="card-text"><%= listing.country %></p> 
+<style>
+    .listing-header {
+        margin-bottom: 2rem;
+    }
+    
+    .listing-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .listing-location {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .listing-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .rating-stars {
+        color: #ffd700;
+    }
+    
+    .main-content {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 3rem;
+        margin-top: 2rem;
+    }
+    
+    .listing-details {
+        background: white;
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .listing-image-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1rem 1rem 0 0;
+    }
+    
+    .listing-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .listing-image:hover {
+        transform: scale(1.05);
+    }
+    
+    .image-overlay {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .overlay-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .overlay-btn:hover {
+        background: white;
+        transform: scale(1.1);
+    }
+    
+    .listing-info {
+        padding: 2rem;
+    }
+    
+    .host-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid #e1e5e9;
+    }
+    
+    .host-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fe424d 0%, #ff6b7a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    
+    .host-details h5 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .host-details p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .listing-description {
+        line-height: 1.6;
+        color: #555;
+        margin-bottom: 1.5rem;
+    }
+    
+    .amenities {
+        margin-bottom: 1.5rem;
+    }
+    
+    .amenities h6 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .amenity-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .amenity-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+    }
+    
+    .sidebar {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+    
+    .booking-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        border: 1px solid #e1e5e9;
+    }
+    
+    .price-info {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #fe424d;
+    }
+    
+    .price-period {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .booking-form .form-control {
+        margin-bottom: 1rem;
+    }
+    
+    .book-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #fe424d 0%, #ff6b7a 100%);
+        border: none;
+        color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(254, 66, 77, 0.3);
+    }
+    
+    .book-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(254, 66, 77, 0.4);
+    }
+    
+    .listing-actions {
+        display: flex;
+        gap: 1rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .reviews-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .review-form {
+        background: #f8f9fa;
+        padding: 2rem;
+        border-radius: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .review-form h4 {
+        margin-bottom: 1.5rem;
+        color: #333;
+    }
+    
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .review-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        border: none;
+    }
+    
+    .review-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .reviewer-name {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .review-date {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .map-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 2px solid #f0f0f0;
+    }
+    
+    .map-container {
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        height: 400px;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .main-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .sidebar {
+            position: static;
+            order: -1;
+        }
+        
+        .booking-card {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .listing-title {
+            font-size: 1.5rem;
+        }
+        
+        .listing-image {
+            height: 250px;
+        }
+        
+        .listing-info {
+            padding: 1.5rem;
+        }
+        
+        .booking-card {
+            padding: 1.5rem;
+        }
+        
+        .price {
+            font-size: 1.5rem;
+        }
+        
+        .listing-actions {
+            flex-direction: column;
+        }
+        
+        .action-btn {
+            min-width: auto;
+        }
+        
+        .reviews-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .amenity-list {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .main-content {
+            gap: 1rem;
+        }
+        
+        .listing-info {
+            padding: 1rem;
+        }
+        
+        .booking-card {
+            padding: 1rem;
+        }
+        
+        .review-form {
+            padding: 1rem;
+        }
+        
+        .host-info {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="listing-header">
+    <h1 class="listing-title"><%= listing.title %></h1>
+    <div class="listing-location">
+        <i class="fas fa-map-marker-alt text-danger me-1"></i>
+        <%= listing.location %>, <%= listing.country %>
+    </div>
+    <div class="listing-rating">
+        <div class="rating-stars">
+            <% if(listing.reviews && listing.reviews.length > 0) { %>
+                <% let avgRating = listing.reviews.reduce((sum, review) => sum + review.rating, 0) / listing.reviews.length %>
+                <% for(let i = 1; i <= 5; i++) { %>
+                    <i class="fas fa-star <%= i <= avgRating ? '' : 'text-muted' %>"></i>
+                <% } %>
+                <span class="ms-2"><%= avgRating.toFixed(1) %> (<%= listing.reviews.length %> reviews)</span>
+            <% } else { %>
+                <span class="text-muted">No reviews yet</span>
+            <% } %>
+        </div>
     </div>
 </div>
-</div> 
+
+<div class="main-content">
+    <div class="listing-details">
+        <div class="listing-image-container">
+            <img src="<%= listing.image.url %>" class="listing-image" alt="<%= listing.title %>">
+            <div class="image-overlay">
+                <button class="overlay-btn" title="Save to favorites">
+                    <i class="far fa-heart"></i>
+                </button>
+                <button class="overlay-btn" title="Share">
+                    <i class="fas fa-share"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="listing-info">
+            <div class="host-info">
+                <div class="host-avatar">
+                    <%= listing.owner.username.charAt(0).toUpperCase() %>
+                </div>
+                <div class="host-details">
+                    <h5>Hosted by <%= listing.owner.username %></h5>
+                    <p>Superhost • Joined in 2023</p>
+                </div>
+            </div>
+            
+            <div class="listing-description">
+                <p><%= listing.description %></p>
+            </div>
+            
+            <div class="amenities">
+                <h6>What this place offers</h6>
+                <div class="amenity-list">
+                    <div class="amenity-item">
+                        <i class="fas fa-wifi text-success"></i>
+                        <span>Free WiFi</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-car text-primary"></i>
+                        <span>Free parking</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-snowflake text-info"></i>
+                        <span>Air conditioning</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-utensils text-warning"></i>
+                        <span>Kitchen</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="sidebar">
+        <div class="booking-card">
+            <div class="price-info">
+                <span class="price">₹<%= listing.price.toLocaleString("en-IN") %></span>
+                <span class="price-period">/night</span>
+            </div>
+            
+            <div class="booking-form">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="form-label">Check-in</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label">Check-out</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <label class="form-label">Guests</label>
+                <select class="form-control">
+                    <option>1 guest</option>
+                    <option>2 guests</option>
+                    <option>3 guests</option>
+                    <option>4 guests</option>
+                </select>
+                <button class="book-btn">Reserve</button>
+            </div>
+            
+            <div class="text-center mt-3">
+                <small class="text-muted">You won't be charged yet</small>
+            </div>
+        </div>
+    </div>
+</div>
 
 <% if(currentUser && listing.owner._id.equals(currentUser._id)) { %>
-<div class="btns">
-    <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-2 edit-btn">Edit</a>
-    <form action="/listings/<%= listing._id %>?_method=DELETE" method="post">
-        <button class="btn btn-dark offset-3">Delete</button>
-    </form>
+    <div class="listing-actions">
+        <a href="/listings/<%= listing._id %>/edit" class="btn btn-outline-primary action-btn">
+            <i class="fas fa-edit me-2"></i>Edit Listing
+        </a>
+        <form action="/listings/<%= listing._id %>?_method=DELETE" method="post" style="flex: 1;">
+            <button class="btn btn-outline-danger action-btn" onclick="return confirm('Are you sure?')">
+                <i class="fas fa-trash me-2"></i>Delete Listing
+            </button>
+        </form>
+    </div>
+<% } %>
+
+<div class="map-section">
+    <h3 class="mb-3">Where you'll be</h3>
+    <div class="map-container">
+        <div id="map"></div>
+    </div>
 </div>
-<% } %>
 
-
-<div class="col-6 offset-2 mb-3">
-    <% if(currentUser)  { %>
-    <h4>Leave a Review</h4>
-    <form action="/listings/<%= listing.id %>/reviews" method="post" novalidate class="needs-validation">
-        <!-- <div class="mb-3 mt-3">
-        <label for="rating" class="fomr-label">Rating</label>
-        <input type="range" name="review[rating]" min="1" max="5" id="rating" class="form-range">
-        </div> -->        <fieldset class="starability-slot">
-            <legend>Rating:</legend>
-            <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
-            <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-            <label for="first-rate1" title="Terrible">1 star</label>
-            <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-            <label for="first-rate2" title="Not good">2 stars</label>
-            <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-            <label for="first-rate3" title="Average">3 stars</label>
-            <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-            <label for="first-rate4" title="Very good">4 stars</label>
-            <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-            <label for="first-rate5" title="Amazing">5 stars</label>
-          </fieldset>
-        <div class="mb-3 mt-3">
-            <label for="comment" class="fomr-label">Comments</label>
-            <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
-            <div class="invalid-feedback">Please submit some comments for reviews </div>
+<div class="reviews-section">
+    <% if(currentUser) { %>
+        <div class="review-form">
+            <h4>Leave a Review</h4>
+            <form action="/listings/<%= listing.id %>/reviews" method="post" novalidate class="needs-validation">
+                <fieldset class="starability-slot mb-3">
+                    <legend>Rating:</legend>
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                </fieldset>
+                
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comments</label>
+                    <textarea name="review[comment]" id="comment" cols="30" rows="4" class="form-control" placeholder="Share your experience..." required></textarea>
+                    <div class="invalid-feedback">Please submit some comments for reviews</div>
+                </div>
+                
+                <button class="btn btn-primary">Submit Review</button>
+            </form>
         </div>
-        <button class="btn btn-outline-dark">Submit</button>
-    </form>
-<% } %>
+    <% } %>
+    
     <% if(listing.reviews && listing.reviews.length > 0) { %>
-        <p><b>All Reviews</b></p>
-        <div class="row">
+        <div class="reviews-header">
+            <h3>Reviews (<%= listing.reviews.length %>)</h3>
+        </div>
+        
+        <div class="reviews-grid">
             <% for(let review of listing.reviews) { %>
-                <div class="card col-5 ms-3 mb-3">
-                    <div class="card-body">
-                        <h5 class="card-title">@<%=  review.author.username %></h5>
-                        <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
-                        <p class="card-text"><%= review.comment %></p>
+                <div class="review-card">
+                    <div class="review-header">
+                        <h6 class="reviewer-name">@<%= review.author.username %></h6>
+                        <% if(currentUser && review.author.equals(currentUser._id)) { %>
+                            <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="post" style="display: inline;">
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this review?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        <% } %>
                     </div>
-                    <% if(currentUser && review.author.equals(currentUser._id)) { %>
-                        <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="mb-3" method="post">
-                            <button class="btn btn-sm btn-dark">Delete</button>
-                        </form>
-                    <% } %>
+                    <div class="starability-result mb-2" data-rating="<%= review.rating %>"></div>
+                    <p class="review-comment"><%= review.comment %></p>
                 </div>
             <% } %>
+        </div>
+    <% } else { %>
+        <div class="text-center py-5">
+            <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No reviews yet</h4>
+            <p class="text-muted">Be the first to leave a review!</p>
         </div>
     <% } %>
 </div>

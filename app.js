@@ -12,7 +12,7 @@ const methodOverride = require('method-override');
 const engine = require('ejs-mate');
 const ExpressError = require('./utils/ExpressError.js');
 const session = require('express-session');
-const MongoStrore = require('connect-mongo'); 
+const MongoStore = require('connect-mongo'); 
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -30,34 +30,52 @@ app.use(methodOverride('_method'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.engine('ejs',engine);  
 
-const dbUrl = process.env.ATLASDB_URL;
+const dbUrl = process.env.ATLASDB_URL || "mongodb://localhost:27017/wanderlust";
 
-main().then(()=>{
-    console.log("Connected to MongoDB successfully");
-}).catch((err)=>{
-    console.log("Error connecting to MongoDB", err);
-});
-async function main() {
-  await mongoose.connect(dbUrl);
+async function connectToDatabase() {
+    try {
+        await mongoose.connect(dbUrl);
+        console.log("✅ Connected to MongoDB successfully");
+        return true;
+    } catch (err) {
+        console.log("❌ Error connecting to MongoDB:", err.message);
+        console.log("💡 Please install MongoDB or use MongoDB Atlas");
+        console.log("📖 See MONGODB_ATLAS_SETUP.md for cloud setup instructions");
+        return false;
+    }
+}
+
+// Initialize database connection
+connectToDatabase();
+
+let store;
+try {
+    store = MongoStore.create({
+        mongoUrl: dbUrl,
+        crypto: {
+            secret: process.env.SECRET || "fallbacksecretkey",
+        },
+        touchAfter: 24 * 3600, // time period in seconds after which the session will be updated
+        connectTimeout: 10000, // 10 seconds timeout
+        serverSelectionTimeoutMS: 10000 // 10 seconds timeout
+    });
+
+    store.on("error", (e) => {
+        console.log("Session Store Error", e);
+        console.log("⚠️  Falling back to memory store");
+    });
+
+    console.log("✅ MongoDB session store created successfully");
+} catch (err) {
+    console.log("⚠️  Session store creation failed:", err.message);
+    console.log("⚠️  Using memory store (sessions won't persist between restarts)");
+    store = null;
 }
 
 
-const store = MongoStrore.create({
-    mongoUrl: dbUrl,
-    crypto: {
-        secret: process.env.SECRET,
-    },
-    touchAfter: 24 * 3600 // time period in seconds after which the session will be updated   
-});
-
-store.on("error", () => {
-    console.log("Session Store Error", e);
-});
-
-
 const sessionOptions = {
-    store,
-    secret: process.env.SECRET,
+    store: store || undefined, // Use memory store if MongoDB store fails
+    secret: process.env.SECRET || "fallbacksecretkey",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -65,7 +83,7 @@ const sessionOptions = {
         maxAge: 1000 * 60 * 60 * 24 * 3, // 3 day
         httpOnly: true,
     }
-}; 
+};
 
 
 
