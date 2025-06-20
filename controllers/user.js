@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const User = require("../models/user");
 
 // Security utilities
@@ -129,4 +130,55 @@ module.exports.checkUsername = async (req, res) => {
             message: "Error checking username availability" 
         });
     }
+};
+
+module.exports.renderForgotPasswordForm = (req, res) => {
+    res.render('users/forgot-password.ejs');
+};
+
+module.exports.handleForgotPassword = async (req, res) => {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+        req.flash('error', 'No account with that email found.');
+        return res.redirect('/forgot-password');
+    }
+    // Generate token
+    const token = crypto.randomBytes(20).toString('hex');
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+    // For demo: show link instead of sending email
+    req.flash('success', `Password reset link: /reset-password/${token}`);
+    res.redirect('/forgot-password');
+};
+
+module.exports.renderResetPasswordForm = async (req, res) => {
+    const { token } = req.params;
+    const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+        req.flash('error', 'Password reset token is invalid or has expired.');
+        return res.redirect('/forgot-password');
+    }
+    res.render('users/reset-password.ejs', { token });
+};
+
+module.exports.handleResetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+    const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+    if (!user) {
+        req.flash('error', 'Password reset token is invalid or has expired.');
+        return res.redirect('/forgot-password');
+    }
+    if (password !== confirmPassword) {
+        req.flash('error', 'Passwords do not match.');
+        return res.redirect(`/reset-password/${token}`);
+    }
+    await user.setPassword(password);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+    req.flash('success', 'Your password has been updated. You can now log in.');
+    res.redirect('/login');
 };

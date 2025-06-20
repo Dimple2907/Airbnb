@@ -7,7 +7,9 @@ const userSchema = new Schema({
     email:{
         type:String,
         required:true
-    }
+    },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date
 });
 
 userSchema.plugin(passportLocalMongoose);  //automatically adds username and password fields to the schema

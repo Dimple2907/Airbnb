@@ -30,4 +30,10 @@ router.get("/check-username/:username", usernameCheckLimiter, wrapAsync(userCont
 //logout router
 router.get("/logout",userController.logout);
 
+// Forgot password routes
+router.get('/forgot-password', userController.renderForgotPasswordForm);
+router.post('/forgot-password', userController.handleForgotPassword);
+router.get('/reset-password/:token', userController.renderResetPasswordForm);
+router.post('/reset-password/:token', userController.handleResetPassword);
+
 module.exports = router;

@@ -176,23 +176,7 @@
                             <i class="fas fa-spinner fa-spin"></i>
                             Creating account...
                         </span>
-                    </button>
-                </form>
-
-                <div class="auth-divider">
-                    <span>or</span>
-                </div>
-
-                <div class="social-login">
-                    <button class="btn btn-outline-secondary social-btn">
-                        <i class="fab fa-google"></i>
-                        Continue with Google
-                    </button>
-                    <button class="btn btn-outline-secondary social-btn">
-                        <i class="fab fa-facebook-f"></i>
-                        Continue with Facebook
-                    </button>
-                </div>
+                    </button>                </form>
 
                 <div class="auth-footer">
                     <p>Already have an account? 
@@ -471,20 +455,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 this.parentElement.classList.remove('has-value');
             }
-        });
-    });
-
-    // Social login handlers
-    document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Add ripple effect
-            this.classList.add('clicked');
-            setTimeout(() => this.classList.remove('clicked'), 300);
-            
-            // Show coming soon message
-            const provider = this.textContent.includes('Google') ? 'Google' : 'Facebook';
-            showToast(`${provider} signup coming soon!`, 'info');
         });
     });
     

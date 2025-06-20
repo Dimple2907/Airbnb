@@ -84,7 +84,6 @@
                                 Remember me
                             </label>
                         </div>
-                        <a href="#" class="forgot-password" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Forgot password?</a>
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-lg w-100 auth-submit" id="loginBtn">
@@ -96,23 +95,7 @@
                             <i class="fas fa-spinner fa-spin"></i>
                             Signing in...
                         </span>
-                    </button>
-                </form>
-
-                <div class="auth-divider">
-                    <span>or</span>
-                </div>
-
-                <div class="social-login">
-                    <button class="btn btn-outline-secondary social-btn">
-                        <i class="fab fa-google"></i>
-                        Continue with Google
-                    </button>
-                    <button class="btn btn-outline-secondary social-btn">
-                        <i class="fab fa-facebook-f"></i>
-                        Continue with Facebook
-                    </button>
-                </div>
+                    </button>                </form>
 
                 <div class="auth-footer">
                     <p>Don't have an account? 
@@ -121,54 +104,6 @@
                 </div>
             </div>
         </div>    </div>
-</div>
-
-<!-- Forgot Password Modal -->
-<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="forgotPasswordModalLabel">
-                    <i class="fas fa-key me-2"></i>Reset Password
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted mb-3">Enter your email address and we'll send you a link to reset your password.</p>
-                <form id="forgotPasswordForm">
-                    <div class="form-group">
-                        <label for="resetEmail" class="form-label">
-                            <i class="fas fa-envelope"></i>
-                            Email Address
-                        </label>
-                        <input 
-                            type="email" 
-                            class="form-control modern-input" 
-                            id="resetEmail" 
-                            placeholder="Enter your email address"
-                            required
-                        >
-                        <div class="invalid-feedback">
-                            Please enter a valid email address
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="sendResetBtn">
-                    <span class="btn-text">
-                        <i class="fas fa-paper-plane"></i>
-                        Send Reset Link
-                    </span>
-                    <span class="btn-loading" style="display: none;">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        Sending...
-                    </span>
-                </button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Features Section -->
@@ -290,60 +225,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.parentElement.classList.remove('has-value');
             }
         });
-    });    // Social login handlers
-    document.querySelectorAll('.social-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Add ripple effect
-            this.classList.add('clicked');
-            setTimeout(() => this.classList.remove('clicked'), 300);
-            
-            // Show coming soon message
-            const provider = this.textContent.includes('Google') ? 'Google' : 'Facebook';
-            showToast(`${provider} login coming soon!`, 'info');
-        });
     });
     
-    // Forgot password functionality
-    const sendResetBtn = document.getElementById('sendResetBtn');
-    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-    const resetEmailInput = document.getElementById('resetEmail');
-    
-    if (sendResetBtn && forgotPasswordForm) {
-        sendResetBtn.addEventListener('click', function() {
-            const email = resetEmailInput.value.trim();
-            
-            if (!email || !isValidEmail(email)) {
-                resetEmailInput.classList.add('is-invalid');
-                return;
-            }
-            
-            // Show loading state
-            sendResetBtn.querySelector('.btn-text').style.display = 'none';
-            sendResetBtn.querySelector('.btn-loading').style.display = 'inline-block';
-            sendResetBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                showToast('Password reset link sent to your email!', 'success');
-                bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal')).hide();
-                
-                // Reset form
-                forgotPasswordForm.reset();
-                resetEmailInput.classList.remove('is-invalid');
-                sendResetBtn.querySelector('.btn-text').style.display = 'inline-block';
-                sendResetBtn.querySelector('.btn-loading').style.display = 'none';
-                sendResetBtn.disabled = false;
-            }, 2000);
-        });
-        
-        resetEmailInput.addEventListener('input', function() {
-            if (this.classList.contains('is-invalid') && isValidEmail(this.value)) {
-                this.classList.remove('is-invalid');
-            }
-        });
-    }
-      // Helper functions
+    // Helper functions
     function checkLoginLockout() {
         if (isLockedOut()) {
             const remainingTime = Math.ceil((lastAttemptTime + lockoutDuration - Date.now()) / 60000);

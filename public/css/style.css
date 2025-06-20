@@ -661,33 +661,7 @@ body {
     z-index: 1;
 }
 
-.social-login {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-}
 
-.social-btn {
-    border: 2px solid #e1e5e9;
-    border-radius: 0.75rem;
-    padding: 0.875rem 1rem;
-    background: white;
-    color: #333;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.social-btn:hover {
-    border-color: #fe424d;
-    background: #fef7f7;
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
