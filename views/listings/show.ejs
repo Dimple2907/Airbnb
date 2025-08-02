@@ -409,7 +409,7 @@
         <div class="listing-info">
             <div class="host-info">
                 <div class="host-avatar">
-                    <%= listing.owner.username.charAt(0).toUpperCase() %>
+                   <%= listing.owner && listing.owner.username ? listing.owner.username.charAt(0).toUpperCase() : 'U' %>
                 </div>
                 <div class="host-details">
                     <h5>Hosted by <%= listing.owner.username %></h5>
