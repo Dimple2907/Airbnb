@@ -128,6 +128,11 @@ app.use((req, res, next) => {
 
 
 
+// Redirect root route to listings
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 app.use("/listings",listingsRouter);
 app.use("/listings/:id/reviews",reviewsRouter);
 app.use("/",userRouter);
@@ -144,5 +149,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(8080, () =>{
-    console.log('Server started on port 8080');
+    console.log('Server started on port http://localhost:8080');
 });
